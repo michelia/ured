@@ -2,7 +2,7 @@
 
 使用 [github.com/mediocregopher/radix]()操作redis.
 
-简单的封装
+简单的封装. Do + Cmd + FlatCmd + Pipeline, and type alias.
 
 # 样例
 ```go
