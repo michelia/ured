@@ -7,10 +7,11 @@ import (
 	"github.com/michelia/ulog"
 )
 
-type (
-	CmdAction = radix.CmdAction
-	Cmd       = radix.Cmd
-	FlatCmd   = radix.FlatCmd
+type CmdAction = radix.CmdAction
+
+var (
+	Cmd     = radix.Cmd
+	FlatCmd = radix.FlatCmd
 )
 
 type Config struct {
@@ -53,7 +54,7 @@ func New(slog ulog.Logger, c Config) *Red {
 	// and has a 1 minute timeout on all operations
 	customConnFunc := func(network, addr string) (radix.Conn, error) {
 		return radix.Dial(network, addr,
-			radix.DialTimeout(c.DialTimeout*time.Second),
+			radix.DialTimeout(time.Second*time.Duration(dialTimeout)),
 			radix.DialAuthPass(c.Passwd),
 			radix.DialSelectDB(c.DbNum),
 			radix.DialReadTimeout(time.Second*5),
@@ -61,7 +62,7 @@ func New(slog ulog.Logger, c Config) *Red {
 		)
 	}
 next:
-	pool, err := radix.NewPool("tcp", c.Addr, c.PoolSize, PoolConnFunc(customConnFunc))
+	pool, err := radix.NewPool("tcp", c.Addr, poolSize, radix.PoolConnFunc(customConnFunc))
 	if err != nil {
 		slog.Error().Caller().Err(err).Msg("connect redis err, wait 3 second and reconnect")
 		time.Sleep(time.Second * 3)
