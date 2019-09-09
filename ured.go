@@ -72,7 +72,7 @@ func New(slog ulog.Logger, c Config) *Red {
 next:
 	pool, err := radix.NewPool("tcp", c.Addr, poolSize, radix.PoolConnFunc(customConnFunc))
 	if err != nil {
-		slog.Error().Caller().Err(err).Msg("connect redis err, wait 3 second and reconnect")
+		slog.Error().Caller().Err(err).Str("action", "ured").Msg("connect redis err, wait 3 second and reconnect")
 		time.Sleep(time.Second * 3)
 		goto next
 	}
