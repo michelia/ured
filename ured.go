@@ -53,10 +53,18 @@ func New(slog ulog.Logger, c Config) *Red {
 	// this is a ConnFunc which will set up a connection which is authenticated
 	// and has a 1 minute timeout on all operations
 	customConnFunc := func(network, addr string) (radix.Conn, error) {
+		if c.DbNum != 0 {
+			return radix.Dial(network, addr,
+				radix.DialTimeout(time.Second*time.Duration(dialTimeout)),
+				radix.DialAuthPass(c.Passwd),
+				radix.DialSelectDB(c.DbNum),
+				radix.DialReadTimeout(time.Second*5),
+				radix.DialWriteTimeout(time.Second*5),
+			)
+		}
 		return radix.Dial(network, addr,
 			radix.DialTimeout(time.Second*time.Duration(dialTimeout)),
 			radix.DialAuthPass(c.Passwd),
-			radix.DialSelectDB(c.DbNum),
 			radix.DialReadTimeout(time.Second*5),
 			radix.DialWriteTimeout(time.Second*5),
 		)
